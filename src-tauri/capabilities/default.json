@@ -1,0 +1,52 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-start-dragging",
+    "opener:default",
+    "dialog:default",
+    "store:default",
+    "os:default",
+    "notification:default",
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "$APPCONFIG/sounds/*" }, { "path": "$RESOURCE/sounds/*" }]
+    },
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [{ "path": "$APPCONFIG/sounds/*" }]
+    },
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [{ "path": "$APPCONFIG/sounds" }]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [{ "path": "$APPCONFIG/sounds" }]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        { "path": "$APPCONFIG/sounds" },
+        { "path": "$APPCONFIG/sounds/*" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [{ "path": "$APPCONFIG/sounds/*" }]
+    },
+    {
+      "identifier": "fs:allow-copy-file",
+      "allow": [
+        { "path": "$RESOURCE/sounds/*" },
+        { "path": "$APPCONFIG/sounds/*" }
+      ]
+    }
+  ]
+}
