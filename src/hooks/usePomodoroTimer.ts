@@ -26,7 +26,8 @@ export function usePomodoroTimer() {
     notificationsEnabled,
     activeSound,
     isRunning,
-    isLoaded
+    isLoaded,
+    volume
   } = useAppSelector((state) => state.pomodoro);
 
   // Refs for the timer loop
@@ -51,6 +52,7 @@ export function usePomodoroTimer() {
   const longBreakDurationRef = useRef(longBreakDuration);
   const activeSoundRef = useRef(activeSound);
   const notificationsEnabledRef = useRef(notificationsEnabled);
+  const volumeRef = useRef(volume);
 
   useEffect(() => { stateRef.current = state; }, [state]);
   useEffect(() => { cyclesRef.current = cycles; }, [cycles]);
@@ -59,6 +61,7 @@ export function usePomodoroTimer() {
   useEffect(() => { longBreakDurationRef.current = longBreakDuration; }, [longBreakDuration]);
   useEffect(() => { activeSoundRef.current = activeSound; }, [activeSound]);
   useEffect(() => { notificationsEnabledRef.current = notificationsEnabled; }, [notificationsEnabled]);
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
 
   // Load settings on startup
   useEffect(() => {
@@ -117,7 +120,7 @@ export function usePomodoroTimer() {
       const url = URL.createObjectURL(blob);
       blobUrlRef.current = url;
       const audio = new Audio(url);
-      audio.volume = 1.0;
+      audio.volume = volumeRef.current / 100;
       audio.loop = true;
       audioRef.current = audio;
       await audio.play();
@@ -219,6 +222,13 @@ export function usePomodoroTimer() {
     const secs = (timeLeft % 60).toString().padStart(2, '0');
     document.title = `${mins}:${secs} - Tmurv`;
   }, [timeLeft]);
+
+  // Adjust volume in real time if alert sound is already playing
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
 
   return {
     isLoaded,

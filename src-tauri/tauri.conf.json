@@ -13,10 +13,10 @@
     "windows": [
       {
         "title": "Tmurv",
-        "width": 380,
-        "height": 600,
-        "minWidth": 380,
-        "minHeight": 600,
+        "width": 400,
+        "height": 610,
+        "minWidth": 400,
+        "minHeight": 610,
         "center": true,
         "resizable": true,
         "devtools": true,

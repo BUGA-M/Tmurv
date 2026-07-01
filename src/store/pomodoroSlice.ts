@@ -19,6 +19,7 @@ interface PomodoroSliceState {
   isSoundPlaying: boolean;
   isRunning: boolean;
   isLoaded: boolean;
+  volume: number;
 }
 
 const initialState: PomodoroSliceState = {
@@ -34,6 +35,7 @@ const initialState: PomodoroSliceState = {
   isSoundPlaying: false,
   isRunning: false,
   isLoaded: false,
+  volume: 80,
 };
 
 // Async Thunks
@@ -67,6 +69,7 @@ export const loadSettings = createAsyncThunk(
     const notify = await store.get<boolean>('notificationsEnabled');
     const tray = await store.get<boolean>('minimizeToTray');
     const sound = await store.get<string>('activeSound');
+    const volume = await store.get<number>('volume');
 
     return {
       workDuration: work ?? undefined,
@@ -75,6 +78,7 @@ export const loadSettings = createAsyncThunk(
       notificationsEnabled: notify ?? undefined,
       minimizeToTray: tray ?? undefined,
       activeSound: sound ?? undefined,
+      volume: volume ?? undefined,
     };
   }
 );
@@ -140,6 +144,16 @@ export const updateActiveSound = createAsyncThunk(
   }
 );
 
+export const updateVolume = createAsyncThunk(
+  'pomodoro/updateVolume',
+  async (val: number) => {
+    const store = await Store.load('settings.json');
+    await store.set('volume', val);
+    await store.save();
+    return val;
+  }
+);
+
 const pomodoroSlice = createSlice({
   name: 'pomodoro',
   initialState,
@@ -202,6 +216,9 @@ const pomodoroSlice = createSlice({
         if (action.payload.activeSound !== undefined) {
           state.activeSound = action.payload.activeSound;
         }
+        if (action.payload.volume !== undefined) {
+          state.volume = action.payload.volume;
+        }
       })
       .addCase(updateWorkDuration.fulfilled, (state, action) => {
         state.workDuration = action.payload;
@@ -223,6 +240,9 @@ const pomodoroSlice = createSlice({
       })
       .addCase(updateActiveSound.fulfilled, (state, action) => {
         state.activeSound = action.payload;
+      })
+      .addCase(updateVolume.fulfilled, (state, action) => {
+        state.volume = action.payload;
       });
   }
 });

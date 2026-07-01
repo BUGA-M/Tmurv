@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Music, Bell, Monitor, Settings, Trash2 } from 'lucide-react';
+import { Upload, Music, Bell, Monitor, Settings, Trash2, Volume2, Volume1, VolumeX } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke } from '@tauri-apps/api/core';
 import { appConfigDir, join } from '@tauri-apps/api/path';
@@ -8,7 +8,8 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { 
   updateActiveSound, 
   updateMinimizeToTray, 
-  updateNotificationsEnabled 
+  updateNotificationsEnabled,
+  updateVolume
 } from '../../store/pomodoroSlice';
 import styles from './SettingsPanel.module.css';
 
@@ -18,11 +19,18 @@ export const SettingsPanel: React.FC = () => {
   const {
     activeSound,
     notificationsEnabled,
-    minimizeToTray
+    minimizeToTray,
+    volume
   } = useAppSelector((state) => state.pomodoro);
 
   const [sounds, setSounds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const getVolumeIcon = (vol: number) => {
+    if (vol === 0) return <VolumeX size={16} />;
+    if (vol < 50) return <Volume1 size={16} />;
+    return <Volume2 size={16} />;
+  };
 
   const loadSounds = async () => {
     try {
@@ -139,6 +147,22 @@ export const SettingsPanel: React.FC = () => {
           <Music size={16} />
           <span>Alert Sound</span>
         </h3>
+
+        {/* Volume Slider */}
+        <div className={styles.volumeControl}>
+          <div className={styles.volumeLabel}>
+            {getVolumeIcon(volume)}
+            <span>Volume: {volume}%</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={volume} 
+            onChange={(e) => dispatch(updateVolume(parseInt(e.target.value, 10)))}
+            className={styles.volumeSlider}
+          />
+        </div>
         
         {error && <div className={styles.errorText}>{error}</div>}
 
