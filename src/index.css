@@ -137,6 +137,7 @@ body {
   font-weight: 500;
   font-size: 0.9rem;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
 }
 
 .tab-btn:hover {
@@ -767,10 +768,12 @@ input:checked + .slider:before {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 input[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .sound-list::-webkit-scrollbar {

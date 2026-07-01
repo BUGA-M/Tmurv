@@ -1,25 +1,14 @@
-import { useState } from 'react';
+import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import logo from './assets/Tmurv-logo.png';
-import { Timer } from './components/Timer';
-import { SettingsPanel } from './components/SettingsPanel';
-import { PlanPanel } from './components/PlanPanel';
-import { usePomodoro } from './hooks/usePomodoro';
+import { TimerPage } from './pages/TimerPage';
+import { PlanPage } from './pages/PlanPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { usePomodoroTimer } from './hooks/usePomodoroTimer';
 import { Clock, Calendar, Settings as SettingsIcon, X, Minus } from 'lucide-react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
-type Tab = 'timer' | 'plan' | 'settings';
-
-function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('timer');
-  const { 
-    state, timeLeft, cycles, start, pause, stop, isRunning,
-    workDuration, shortBreakDuration, longBreakDuration,
-    updateWorkDuration, updateShortBreakDuration, updateLongBreakDuration,
-    notificationsEnabled, updateNotificationsEnabled,
-    minimizeToTray, updateMinimizeToTray,
-    activeSound, setActiveSound,
-    isSoundPlaying, dismissSound
-  } = usePomodoro();
+function AppContent() {
+  const { isLoaded, dismissSound } = usePomodoroTimer();
 
   const handleMinimize = async () => {
     try {
@@ -47,6 +36,16 @@ function App() {
     }
   };
 
+  if (!isLoaded) {
+    return (
+      <div className="app-container glass-panel" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+          Loading Settings...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container glass-panel">
       {/* Custom Title Bar for Borderless Window */}
@@ -56,10 +55,10 @@ function App() {
           Tmurv
         </div>
         <div className="titlebar-controls">
-          <button className="titlebar-btn minimize" onClick={handleMinimize} title="Minimiser">
+          <button className="titlebar-btn minimize" onClick={handleMinimize} title="Minimize">
             <Minus size={14} />
           </button>
-          <button className="titlebar-btn close" onClick={handleClose} title="Fermer">
+          <button className="titlebar-btn close" onClick={handleClose} title="Close">
             <X size={14} />
           </button>
         </div>
@@ -67,71 +66,46 @@ function App() {
 
       {/* Navigation Header */}
       <nav className="tab-navigation">
-        <button 
-          className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`}
-          onClick={() => setActiveTab('timer')}
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => `tab-btn ${isActive ? 'active' : ''}`}
+          end
         >
           <Clock size={18} />
           <span>Timer</span>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'plan' ? 'active' : ''}`}
-          onClick={() => setActiveTab('plan')}
+        </NavLink>
+        <NavLink 
+          to="/plan" 
+          className={({ isActive }) => `tab-btn ${isActive ? 'active' : ''}`}
         >
           <Calendar size={18} />
           <span>Plan</span>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
+        </NavLink>
+        <NavLink 
+          to="/settings" 
+          className={({ isActive }) => `tab-btn ${isActive ? 'active' : ''}`}
         >
           <SettingsIcon size={18} />
           <span>Settings</span>
-        </button>
+        </NavLink>
       </nav>
 
       {/* Main Content Area */}
       <div className="content-container">
-        {activeTab === 'timer' && (
-          <Timer 
-            state={state}
-            timeLeft={timeLeft}
-            cycles={cycles}
-            isRunning={isRunning}
-            onStart={start}
-            onPause={pause}
-            onStop={stop}
-            isSoundPlaying={isSoundPlaying}
-            onDismissSound={dismissSound}
-          />
-        )}
-        {activeTab === 'plan' && (
-          <PlanPanel 
-            workDuration={workDuration}
-            shortBreakDuration={shortBreakDuration}
-            longBreakDuration={longBreakDuration}
-            updateWorkDuration={updateWorkDuration}
-            updateShortBreakDuration={updateShortBreakDuration}
-            updateLongBreakDuration={updateLongBreakDuration}
-            state={state}
-            timeLeft={timeLeft}
-            cycles={cycles}
-            isSoundPlaying={isSoundPlaying}
-          />
-        )}
-        {activeTab === 'settings' && (
-          <SettingsPanel 
-            activeSound={activeSound}
-            setActiveSound={setActiveSound}
-            notificationsEnabled={notificationsEnabled}
-            updateNotificationsEnabled={updateNotificationsEnabled}
-            minimizeToTray={minimizeToTray}
-            updateMinimizeToTray={updateMinimizeToTray}
-          />
-        )}
+        <Routes>
+          <Route path="/" element={<TimerPage onDismissSound={dismissSound} />} />
+          <Route path="/plan" element={<PlanPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
       </div>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <HashRouter>
+      <AppContent />
+    </HashRouter>
+  );
+}

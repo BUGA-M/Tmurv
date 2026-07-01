@@ -4,24 +4,23 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { invoke } from '@tauri-apps/api/core';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { readDir, exists, mkdir, remove } from '@tauri-apps/plugin-fs';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { 
+  updateActiveSound, 
+  updateMinimizeToTray, 
+  updateNotificationsEnabled 
+} from '../../store/pomodoroSlice';
+import styles from './SettingsPanel.module.css';
 
-interface SettingsPanelProps {
-  activeSound: string | null;
-  setActiveSound: (sound: string | null) => void;
-  notificationsEnabled: boolean;
-  updateNotificationsEnabled: (val: boolean) => void;
-  minimizeToTray: boolean;
-  updateMinimizeToTray: (val: boolean) => void;
-}
+export const SettingsPanel: React.FC = () => {
+  const dispatch = useAppDispatch();
+  
+  const {
+    activeSound,
+    notificationsEnabled,
+    minimizeToTray
+  } = useAppSelector((state) => state.pomodoro);
 
-export const SettingsPanel: React.FC<SettingsPanelProps> = ({
-  activeSound,
-  setActiveSound,
-  notificationsEnabled,
-  updateNotificationsEnabled,
-  minimizeToTray,
-  updateMinimizeToTray,
-}) => {
   const [sounds, setSounds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +62,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       if (selected && typeof selected === 'string') {
         const safeFileName = await invoke<string>('upload_sound', { filePath: selected });
         await loadSounds();
-        setActiveSound(safeFileName);
+        dispatch(updateActiveSound(safeFileName));
       }
     } catch (e: any) {
       setError(e.toString());
@@ -79,7 +78,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       await remove(soundPath);
       
       if (activeSound === sound) {
-        setActiveSound(null);
+        dispatch(updateActiveSound(null));
       }
       await loadSounds();
     } catch (err: any) {
@@ -96,72 +95,72 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       </div>
 
       {/* System Settings */}
-      <div className="settings-group">
-        <div className="settings-option">
-          <div className="option-label">
+      <div className={styles.settingsGroup}>
+        <div className={styles.settingsOption}>
+          <div className={styles.optionLabel}>
             <Monitor size={18} />
             <div>
               <span>Minimize to System Tray</span>
               <p>Keep running in background when closed</p>
             </div>
           </div>
-          <label className="switch">
+          <label className={styles.switch}>
             <input 
               type="checkbox" 
               checked={minimizeToTray}
-              onChange={(e) => updateMinimizeToTray(e.target.checked)}
+              onChange={(e) => dispatch(updateMinimizeToTray(e.target.checked))}
             />
-            <span className="slider round"></span>
+            <span className={`${styles.slider} ${styles.round}`}></span>
           </label>
         </div>
 
-        <div className="settings-option">
-          <div className="option-label">
+        <div className={styles.settingsOption}>
+          <div className={styles.optionLabel}>
             <Bell size={18} />
             <div>
               <span>Desk Notifications</span>
               <p>Receive alert notifications when timer ends</p>
             </div>
           </div>
-          <label className="switch">
+          <label className={styles.switch}>
             <input 
               type="checkbox" 
               checked={notificationsEnabled}
-              onChange={(e) => updateNotificationsEnabled(e.target.checked)}
+              onChange={(e) => dispatch(updateNotificationsEnabled(e.target.checked))}
             />
-            <span className="slider round"></span>
+            <span className={`${styles.slider} ${styles.round}`}></span>
           </label>
         </div>
       </div>
 
       {/* Audio Alert Settings */}
-      <div className="settings-group" style={{ marginTop: '20px' }}>
-        <h3 className="group-title">
+      <div className={styles.settingsGroup} style={{ marginTop: '20px' }}>
+        <h3 className={styles.groupTitle}>
           <Music size={16} />
           <span>Alert Sound</span>
         </h3>
         
-        {error && <div className="error-text">{error}</div>}
+        {error && <div className={styles.errorText}>{error}</div>}
 
-        <div className="sound-list">
+        <div className={styles.soundList}>
           {sounds.length === 0 ? (
-            <div className="empty-list-text">
+            <div className={styles.emptyListText}>
               No sounds available. Upload one below.
             </div>
           ) : (
             sounds.map(sound => (
               <div 
                 key={sound} 
-                className={`sound-item ${activeSound === sound ? 'selected' : ''}`}
-                onClick={() => setActiveSound(sound)}
+                className={`${styles.soundItem} ${activeSound === sound ? styles.selected : ''}`}
+                onClick={() => dispatch(updateActiveSound(sound))}
               >
-                <div className="sound-item-left">
+                <div className={styles.soundItemLeft}>
                   <span>{sound}</span>
                 </div>
-                <div className="sound-item-right">
-                  {activeSound === sound && <div className="dot-active" />}
+                <div className={styles.soundItemRight}>
+                  {activeSound === sound && <div className={styles.dotActive} />}
                   <button 
-                    className="btn-delete-sound" 
+                    className={styles.btnDeleteSound} 
                     onClick={(e) => handleDelete(sound, e)}
                     title="Delete this sound"
                   >
@@ -173,7 +172,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           )}
         </div>
 
-        <button className="btn-upload" onClick={handleUpload}>
+        <button className={styles.btnUpload} onClick={handleUpload}>
           <Upload size={16} />
           Upload Custom Sound
         </button>

@@ -1,0 +1,179 @@
+.timerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 20px 0;
+}
+
+.statusText {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.timerDisplay {
+  font-size: 5.5rem;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
+  text-align: center;
+  margin: 15px 0;
+  transition: all 0.4s ease;
+}
+
+.timerDisplay.stateWork {
+  background: var(--work-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(141, 215, 234, 0.3));
+}
+
+.timerDisplay.stateShortBreak {
+  background: var(--short-break-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(74, 222, 128, 0.35));
+}
+
+.timerDisplay.stateLongBreak {
+  background: var(--long-break-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(192, 132, 252, 0.35));
+}
+
+.timerDisplay.stateIdle {
+  color: #fff;
+}
+
+.cycleDots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+.btnGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn {
+  border: none;
+  border-radius: 50%;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btnPrimary {
+  background: var(--primary);
+  border: none;
+  width: 72px;
+  height: 72px;
+  box-shadow: 0 8px 24px rgba(141, 215, 234, 0.3);
+  color: #061014;
+}
+
+.btnPrimary:hover {
+  background: #7ac3d6;
+  box-shadow: 0 12px 30px rgba(141, 215, 234, 0.45);
+  transform: translateY(-3px) scale(1.03);
+}
+
+@keyframes dismissPulse {
+  0% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.55), 0 0 50px rgba(239, 68, 68, 0.15); }
+  100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+}
+
+.btnDismissSound {
+  border-radius: 40px !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 14px 28px !important;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  animation: dismissPulse 2s infinite ease-in-out;
+}
+
+.btnDismissSound:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  color: #fca5a5 !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.dismissLabel {
+  font-size: 0.9rem;
+}
+
+.timerLogoContainer {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timerLogoImg {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(141, 215, 234, 0.4));
+  transition: transform 0.3s ease;
+}
+
+@keyframes pulseSlow {
+  0% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(141, 215, 234, 0.4)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(141, 215, 234, 0.7)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(141, 215, 234, 0.4)); }
+}
+
+.pulseSlow {
+  animation: pulseSlow 3s infinite ease-in-out;
+}

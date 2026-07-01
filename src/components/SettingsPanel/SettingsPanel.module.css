@@ -1,0 +1,266 @@
+.settingsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settingsOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: all 0.2s;
+}
+
+.settingsOption:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.optionLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.optionLabel svg {
+  color: var(--primary);
+}
+
+.optionLabel div {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionLabel span {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.optionLabel p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Custom Switch Toggle Slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .3s;
+  border: 1px solid var(--border);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .3s;
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(22px);
+  left: 0px;
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.groupTitle svg {
+  color: var(--primary);
+}
+
+.soundList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 6px;
+}
+
+.soundItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+
+.soundItem:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+}
+
+.soundItem.selected {
+  border-color: rgba(141, 215, 234, 0.3);
+  background: rgba(141, 215, 234, 0.12);
+  color: #fff;
+  font-weight: 500;
+}
+
+.soundItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.soundItemLeft span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.soundItemRight {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnDeleteSound {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.soundItem:hover .btnDeleteSound {
+  opacity: 1;
+}
+
+.btnDeleteSound:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.dotActive {
+  width: 6px;
+  height: 6px;
+  background-color: #8dd7ea;
+  border-radius: 50%;
+  transition: opacity 0.2s;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+.soundItem:hover .dotActive {
+  opacity: 0;
+}
+
+.btnUpload {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.btnUpload:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+  background: rgba(141, 215, 234, 0.05);
+}
+
+.emptyListText {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
+
+.soundList::-webkit-scrollbar {
+  width: 5px;
+}
+.soundList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.soundList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}

@@ -1,19 +1,12 @@
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
-import { PomodoroState } from '../hooks/usePomodoro';
-
-interface PlanPanelProps {
-  workDuration: number;
-  shortBreakDuration: number;
-  longBreakDuration: number;
-  updateWorkDuration: (val: number) => void;
-  updateShortBreakDuration: (val: number) => void;
-  updateLongBreakDuration: (val: number) => void;
-  state: PomodoroState;
-  timeLeft: number;
-  cycles: number;
-  isSoundPlaying: boolean;
-}
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { 
+  updateWorkDuration, 
+  updateShortBreakDuration, 
+  updateLongBreakDuration 
+} from '../../store/pomodoroSlice';
+import styles from './PlanPanel.module.css';
 
 interface TimelineStep {
   type: 'work' | 'break' | 'long-break';
@@ -21,26 +14,26 @@ interface TimelineStep {
   duration: number;
 }
 
-export const PlanPanel: React.FC<PlanPanelProps> = ({
-  workDuration,
-  shortBreakDuration,
-  longBreakDuration,
-  updateWorkDuration,
-  updateShortBreakDuration,
-  updateLongBreakDuration,
-  state,
-  timeLeft,
-  cycles,
-  isSoundPlaying,
-}) => {
+export const PlanPanel: React.FC = () => {
+  const dispatch = useAppDispatch();
   
+  const {
+    state,
+    timeLeft,
+    cycles,
+    workDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    isSoundPlaying,
+  } = useAppSelector((state) => state.pomodoro);
+
   const handleDurationChange = (
     value: string, 
-    updater: (val: number) => void
+    updater: (val: number) => any
   ) => {
     const mins = parseInt(value, 10);
     if (!isNaN(mins) && mins > 0) {
-      updater(mins * 60);
+      dispatch(updater(mins * 60));
     }
   };
 
@@ -62,18 +55,15 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
   let activeIndex = -1;
   if (isSoundPlaying) {
     if (state === 'WORK') {
-      // Transitioning from WORK to break
       if (cycles % 4 === 0) {
-        activeIndex = 7; // LONG_BREAK
+        activeIndex = 7;
       } else {
-        activeIndex = ((cycles - 1) % 4) * 2 + 1; // SHORT_BREAK
+        activeIndex = ((cycles - 1) % 4) * 2 + 1;
       }
     } else {
-      // Transitioning from break to WORK
       activeIndex = (cycles % 4) * 2;
     }
   } else {
-    // Normal state
     if (state === 'WORK') {
       activeIndex = (cycles % 4) * 2;
     } else if (state === 'SHORT_BREAK') {
@@ -81,7 +71,6 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
     } else if (state === 'LONG_BREAK') {
       activeIndex = 7;
     } else {
-      // IDLE: point to the upcoming Work session
       activeIndex = (cycles % 4) * 2;
     }
   }
@@ -99,6 +88,30 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
     }
   };
 
+  const getConnectorClass = (isCompleted: boolean, type: string) => {
+    let cls = styles.timelineConnector;
+    if (isCompleted) {
+      cls += ` ${styles.completed}`;
+      if (type === 'work') cls += ` ${styles.work}`;
+      else if (type === 'break') cls += ` ${styles.break}`;
+      else if (type === 'long-break') cls += ` ${styles.longBreak}`;
+    }
+    return cls;
+  };
+
+  const getNodeClass = (isCompleted: boolean, isActive: boolean, isLocked: boolean, type: string) => {
+    let cls = styles.timelineNode;
+    if (type === 'work') cls += ` ${styles.work}`;
+    else if (type === 'break') cls += ` ${styles.break}`;
+    else if (type === 'long-break') cls += ` ${styles.longBreak}`;
+
+    if (isCompleted) cls += ` ${styles.completed}`;
+    else if (isActive) cls += ` ${styles.active}`;
+    else if (isLocked) cls += ` ${styles.locked}`;
+
+    return cls;
+  };
+
   return (
     <div className="panel-container">
       <div className="panel-header">
@@ -107,18 +120,13 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
       </div>
 
       {/* Visual Timeline of Cycles */}
-      <div className="timeline-card">
-        <div className="timeline-title">Complete Cycle Schema</div>
-        <div className="timeline-track">
+      <div className={styles.timelineCard}>
+        <div className={styles.timelineTitle}>Complete Cycle Schema</div>
+        <div className={styles.timelineTrack}>
           {steps.map((step, index) => {
             const isCompleted = index < activeIndex;
             const isActive = index === activeIndex;
             const isLocked = index > activeIndex;
-
-            let nodeClass = `timeline-node ${step.type}`;
-            if (isCompleted) nodeClass += ' completed';
-            else if (isActive) nodeClass += ' active';
-            else if (isLocked) nodeClass += ' locked';
 
             // Calculate background style for badge
             let badgeStyle: React.CSSProperties = {};
@@ -136,35 +144,38 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
 
             return (
               <React.Fragment key={index}>
-                <div className={nodeClass} title={`${step.label}: ${stepMins}m`}>
+                <div 
+                  className={getNodeClass(isCompleted, isActive, isLocked, step.type)} 
+                  title={`${step.label}: ${stepMins}m`}
+                >
                   <span>{step.label}</span>
-                  <span className="time-badge" style={badgeStyle}>
+                  <span className={styles.timeBadge} style={badgeStyle}>
                     {stepMins}m
                   </span>
                 </div>
                 {index < steps.length - 1 && (
                   <div 
-                    className={`timeline-connector ${isCompleted ? 'completed ' + step.type : ''}`} 
+                    className={getConnectorClass(isCompleted, step.type)} 
                   />
                 )}
               </React.Fragment>
             );
           })}
         </div>
-        <div className="timeline-footer">
+        <div className={styles.timelineFooter}>
           {state === 'IDLE' ? 'Plan is ready to start' : `Current phase: ${steps[activeIndex]?.label || ''} (${Math.round(progressPercent)}% completed)`}
         </div>
       </div>
 
       {/* Input settings */}
-      <div className="settings-group" style={{ marginTop: '24px' }}>
-        <h3 className="group-title">
+      <div className={styles.settingsGroup} style={{ marginTop: '24px' }}>
+        <h3 className={styles.groupTitle}>
           <Clock size={16} />
           <span>Customize Durations (Minutes)</span>
         </h3>
 
-        <div className="input-row">
-          <div className="input-field">
+        <div className={styles.inputRow}>
+          <div className={styles.inputField}>
             <label>Focus Duration</label>
             <input 
               type="number" 
@@ -174,7 +185,7 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
             />
           </div>
 
-          <div className="input-field">
+          <div className={styles.inputField}>
             <label>Short Break</label>
             <input 
               type="number" 
@@ -184,7 +195,7 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
             />
           </div>
 
-          <div className="input-field">
+          <div className={styles.inputField}>
             <label>Long Break</label>
             <input 
               type="number" 
