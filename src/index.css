@@ -637,6 +637,7 @@ input:checked + .slider:before {
   align-items: center;
   gap: 4px;
   min-width: 44px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .timeline-node span:first-child {
@@ -651,33 +652,41 @@ input:checked + .slider:before {
   padding: 4px 6px;
   border-radius: 6px;
   color: #fff;
-}
-
-.timeline-node.work .time-badge {
-  background: var(--work-color);
-  box-shadow: 0 0 8px rgba(141, 215, 234, 0.35);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .timeline-node.work span:first-child {
   color: var(--work-color);
 }
 
-.timeline-node.break .time-badge {
-  background: var(--break-color);
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.35);
-}
-
 .timeline-node.break span:first-child {
   color: var(--break-color);
 }
 
-.timeline-node.long-break .time-badge {
-  background: var(--long-break-color);
-  box-shadow: 0 0 8px rgba(192, 132, 252, 0.35);
-}
-
 .timeline-node.long-break span:first-child {
   color: var(--long-break-color);
+}
+
+/* State indicators */
+.timeline-node.active {
+  transform: scale(1.08);
+}
+
+.timeline-node.active span:first-child {
+  text-shadow: 0 0 8px currentColor;
+  animation: active-node-pulse 2s infinite ease-in-out;
+}
+
+.timeline-node.locked {
+  opacity: 0.45;
+}
+
+.timeline-node.completed {
+  opacity: 0.85;
+}
+
+.timeline-node.completed .time-badge {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
 .timeline-connector {
@@ -686,6 +695,27 @@ input:checked + .slider:before {
   background: rgba(255, 255, 255, 0.08);
   min-width: 8px;
   margin: 0 4px;
+  transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.timeline-connector.completed.work {
+  background: var(--work-color);
+  box-shadow: 0 0 6px rgba(141, 215, 234, 0.4);
+}
+
+.timeline-connector.completed.break {
+  background: var(--break-color);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+.timeline-connector.completed.long-break {
+  background: var(--long-break-color);
+  box-shadow: 0 0 6px rgba(192, 132, 252, 0.4);
+}
+
+@keyframes active-node-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 .timeline-footer {

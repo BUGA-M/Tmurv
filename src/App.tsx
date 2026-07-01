@@ -113,6 +113,10 @@ function App() {
             updateWorkDuration={updateWorkDuration}
             updateShortBreakDuration={updateShortBreakDuration}
             updateLongBreakDuration={updateLongBreakDuration}
+            state={state}
+            timeLeft={timeLeft}
+            cycles={cycles}
+            isSoundPlaying={isSoundPlaying}
           />
         )}
         {activeTab === 'settings' && (

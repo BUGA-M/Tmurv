@@ -47,7 +47,7 @@ export const Timer: React.FC<TimerProps> = ({ state, timeLeft, cycles, isRunning
 
       <div className="btn-group" style={{ marginTop: '32px' }}>
         {isSoundPlaying ? (
-          <button className="btn btn-dismiss-sound" onClick={onDismissSound} title="Arrêter le son et commencer la pause">
+          <button className="btn btn-dismiss-sound" onClick={onDismissSound} title="Stop sound and start break">
             <VolumeX size={28} />
             <span className="dismiss-label">Dismiss</span>
           </button>

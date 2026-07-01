@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
   longDuration: 15 * 60,       // 15 mins
   notificationsEnabled: true,
   minimizeToTray: true,
-  activeSound: 'AAAAUUUGHHHH_Meme_Sound_Effect.mp3' as string | null
+  activeSound: 'baraka_a_bnadeem.mp3' as string | null
 };
 
 export function usePomodoro() {
@@ -71,10 +71,10 @@ export function usePomodoro() {
         const soundsDir = await join(configDir, 'sounds');
         
         if (!(await exists(soundsDir))) {
-          await mkdir(soundsDir);
+          await mkdir(soundsDir, { recursive: true });
         }
         
-        const defaultSoundName = 'AAAAUUUGHHHH_Meme_Sound_Effect.mp3';
+        const defaultSoundName = 'baraka_a_bnadeem.mp3';
         const defaultSoundDest = await join(soundsDir, defaultSoundName);
         
         if (!(await exists(defaultSoundDest))) {

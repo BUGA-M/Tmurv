@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
+import { PomodoroState } from '../hooks/usePomodoro';
 
 interface PlanPanelProps {
   workDuration: number;
@@ -8,6 +9,16 @@ interface PlanPanelProps {
   updateWorkDuration: (val: number) => void;
   updateShortBreakDuration: (val: number) => void;
   updateLongBreakDuration: (val: number) => void;
+  state: PomodoroState;
+  timeLeft: number;
+  cycles: number;
+  isSoundPlaying: boolean;
+}
+
+interface TimelineStep {
+  type: 'work' | 'break' | 'long-break';
+  label: string;
+  duration: number;
 }
 
 export const PlanPanel: React.FC<PlanPanelProps> = ({
@@ -17,6 +28,10 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
   updateWorkDuration,
   updateShortBreakDuration,
   updateLongBreakDuration,
+  state,
+  timeLeft,
+  cycles,
+  isSoundPlaying,
 }) => {
   
   const handleDurationChange = (
@@ -33,6 +48,57 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
   const shortMins = Math.floor(shortBreakDuration / 60);
   const longMins = Math.floor(longBreakDuration / 60);
 
+  const steps: TimelineStep[] = [
+    { type: 'work', label: 'Work', duration: workDuration },
+    { type: 'break', label: 'Short', duration: shortBreakDuration },
+    { type: 'work', label: 'Work', duration: workDuration },
+    { type: 'break', label: 'Short', duration: shortBreakDuration },
+    { type: 'work', label: 'Work', duration: workDuration },
+    { type: 'break', label: 'Short', duration: shortBreakDuration },
+    { type: 'work', label: 'Work', duration: workDuration },
+    { type: 'long-break', label: 'Long', duration: longBreakDuration },
+  ];
+
+  let activeIndex = -1;
+  if (isSoundPlaying) {
+    if (state === 'WORK') {
+      // Transitioning from WORK to break
+      if (cycles % 4 === 0) {
+        activeIndex = 7; // LONG_BREAK
+      } else {
+        activeIndex = ((cycles - 1) % 4) * 2 + 1; // SHORT_BREAK
+      }
+    } else {
+      // Transitioning from break to WORK
+      activeIndex = (cycles % 4) * 2;
+    }
+  } else {
+    // Normal state
+    if (state === 'WORK') {
+      activeIndex = (cycles % 4) * 2;
+    } else if (state === 'SHORT_BREAK') {
+      activeIndex = ((cycles - 1) % 4) * 2 + 1;
+    } else if (state === 'LONG_BREAK') {
+      activeIndex = 7;
+    } else {
+      // IDLE: point to the upcoming Work session
+      activeIndex = (cycles % 4) * 2;
+    }
+  }
+
+  const activeStep = steps[activeIndex];
+  const progressPercent = activeStep && state !== 'IDLE'
+    ? Math.min(100, Math.max(0, ((activeStep.duration - timeLeft) / activeStep.duration) * 100))
+    : 0;
+
+  const getStepColor = (type: 'work' | 'break' | 'long-break') => {
+    switch (type) {
+      case 'work': return 'var(--work-color)';
+      case 'break': return 'var(--break-color)';
+      case 'long-break': return 'var(--long-break-color)';
+    }
+  };
+
   return (
     <div className="panel-container">
       <div className="panel-header">
@@ -44,47 +110,50 @@ export const PlanPanel: React.FC<PlanPanelProps> = ({
       <div className="timeline-card">
         <div className="timeline-title">Complete Cycle Schema</div>
         <div className="timeline-track">
-          <div className="timeline-node work" title={`Work: ${workMins}m`}>
-            <span>Work</span>
-            <span className="time-badge">{workMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node break" title={`Break: ${shortMins}m`}>
-            <span>Short</span>
-            <span className="time-badge">{shortMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node work" title={`Work: ${workMins}m`}>
-            <span>Work</span>
-            <span className="time-badge">{workMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node break" title={`Break: ${shortMins}m`}>
-            <span>Short</span>
-            <span className="time-badge">{shortMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node work" title={`Work: ${workMins}m`}>
-            <span>Work</span>
-            <span className="time-badge">{workMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node break" title={`Break: ${shortMins}m`}>
-            <span>Short</span>
-            <span className="time-badge">{shortMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node work" title={`Work: ${workMins}m`}>
-            <span>Work</span>
-            <span className="time-badge">{workMins}m</span>
-          </div>
-          <div className="timeline-connector" />
-          <div className="timeline-node long-break" title={`Long Break: ${longMins}m`}>
-            <span>Long</span>
-            <span className="time-badge">{longMins}m</span>
-          </div>
+          {steps.map((step, index) => {
+            const isCompleted = index < activeIndex;
+            const isActive = index === activeIndex;
+            const isLocked = index > activeIndex;
+
+            let nodeClass = `timeline-node ${step.type}`;
+            if (isCompleted) nodeClass += ' completed';
+            else if (isActive) nodeClass += ' active';
+            else if (isLocked) nodeClass += ' locked';
+
+            // Calculate background style for badge
+            let badgeStyle: React.CSSProperties = {};
+            if (isCompleted) {
+              badgeStyle.background = getStepColor(step.type);
+            } else if (isActive) {
+              badgeStyle.background = `linear-gradient(to right, ${getStepColor(step.type)} ${progressPercent}%, rgba(255, 255, 255, 0.08) ${progressPercent}%)`;
+              badgeStyle.boxShadow = `0 0 12px ${getStepColor(step.type)}3f`;
+            } else {
+              badgeStyle.background = 'rgba(255, 255, 255, 0.05)';
+              badgeStyle.color = 'var(--text-muted)';
+            }
+
+            const stepMins = Math.floor(step.duration / 60);
+
+            return (
+              <React.Fragment key={index}>
+                <div className={nodeClass} title={`${step.label}: ${stepMins}m`}>
+                  <span>{step.label}</span>
+                  <span className="time-badge" style={badgeStyle}>
+                    {stepMins}m
+                  </span>
+                </div>
+                {index < steps.length - 1 && (
+                  <div 
+                    className={`timeline-connector ${isCompleted ? 'completed ' + step.type : ''}`} 
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
-        <div className="timeline-footer">After 4 Focus Sessions, get a Long Break</div>
+        <div className="timeline-footer">
+          {state === 'IDLE' ? 'Plan is ready to start' : `Current phase: ${steps[activeIndex]?.label || ''} (${Math.round(progressPercent)}% completed)`}
+        </div>
       </div>
 
       {/* Input settings */}

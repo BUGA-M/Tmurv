@@ -16,7 +16,11 @@
     "notification:default",
     {
       "identifier": "fs:allow-read-file",
-      "allow": [{ "path": "$APPCONFIG/sounds/*" }, { "path": "$RESOURCE/sounds/*" }]
+      "allow": [
+        { "path": "$APPCONFIG/sounds/*" },
+        { "path": "$RESOURCE/sounds/*" },
+        { "path": "$RESOURCE/resources/sounds/*" }
+      ]
     },
     {
       "identifier": "fs:allow-write-file",
@@ -28,7 +32,10 @@
     },
     {
       "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "$APPCONFIG/sounds" }]
+      "allow": [
+        { "path": "$APPCONFIG" },
+        { "path": "$APPCONFIG/sounds" }
+      ]
     },
     {
       "identifier": "fs:allow-exists",
@@ -45,6 +52,7 @@
       "identifier": "fs:allow-copy-file",
       "allow": [
         { "path": "$RESOURCE/sounds/*" },
+        { "path": "$RESOURCE/resources/sounds/*" },
         { "path": "$APPCONFIG/sounds/*" }
       ]
     }

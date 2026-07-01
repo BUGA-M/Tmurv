@@ -32,7 +32,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       
       const soundsDirExists = await exists(soundsDir);
       if (!soundsDirExists) {
-        await mkdir(soundsDir);
+        await mkdir(soundsDir, { recursive: true });
       }
       
       const entries = await readDir(soundsDir);
@@ -163,7 +163,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   <button 
                     className="btn-delete-sound" 
                     onClick={(e) => handleDelete(sound, e)}
-                    title="Supprimer ce son"
+                    title="Delete this sound"
                   >
                     <Trash2 size={14} />
                   </button>
