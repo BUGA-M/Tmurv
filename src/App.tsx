@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import logo from './assets/Tmurv-logo.png';
 import { TimerPage } from './pages/TimerPage';
+import { UpdaterProvider } from './context/UpdaterContext';
 import { PlanPage } from './pages/PlanPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { usePomodoroTimer } from './hooks/usePomodoroTimer';
@@ -104,8 +105,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <HashRouter>
-      <AppContent />
-    </HashRouter>
+    <UpdaterProvider>
+      <HashRouter>
+        <AppContent />
+      </HashRouter>
+    </UpdaterProvider>
   );
 }

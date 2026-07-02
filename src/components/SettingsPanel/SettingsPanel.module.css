@@ -336,3 +336,39 @@
   transform: scale(1.2);
 }
 
+.btnCheck {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(141, 215, 234, 0.1);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+}
+
+.btnCheck:hover:not(:disabled) {
+  background: var(--primary);
+  color: #061014;
+  box-shadow: 0 4px 12px rgba(141, 215, 234, 0.2);
+}
+
+.btnCheck:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.versionBadge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  font-weight: 600;
+  font-family: monospace;
+}
+

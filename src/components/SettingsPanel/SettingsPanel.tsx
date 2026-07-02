@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Music, Bell, Monitor, Settings, Trash2, Volume2, Volume1, VolumeX } from 'lucide-react';
+import { Upload, Music, Bell, Monitor, Settings, Trash2, Volume2, Volume1, VolumeX, RefreshCw } from 'lucide-react';
+import { useUpdater } from '../../context/UpdaterContext';
 import { open } from '@tauri-apps/plugin-dialog';
 import { invoke } from '@tauri-apps/api/core';
 import { appConfigDir, join } from '@tauri-apps/api/path';
@@ -15,6 +16,7 @@ import styles from './SettingsPanel.module.css';
 
 export const SettingsPanel: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { checkForUpdates, checking } = useUpdater();
   
   const {
     activeSound,
@@ -138,6 +140,30 @@ export const SettingsPanel: React.FC = () => {
             />
             <span className={`${styles.slider} ${styles.round}`}></span>
           </label>
+        </div>
+      </div>
+
+      {/* Update Settings */}
+      <div className={styles.settingsGroup} style={{ marginTop: '20px' }}>
+        <h3 className={styles.groupTitle}>
+          <RefreshCw size={16} />
+          <span>Mise à jour</span>
+        </h3>
+        <div className={styles.settingsOption}>
+          <div className={styles.optionLabel}>
+            <Monitor size={18} />
+            <div>
+              <span>Mises à jour de l'application</span>
+              <p>Rechercher et installer de nouvelles versions</p>
+            </div>
+          </div>
+          <button 
+            className={styles.btnCheck} 
+            onClick={() => checkForUpdates(false)}
+            disabled={checking}
+          >
+            {checking ? 'Recherche...' : 'Vérifier'}
+          </button>
         </div>
       </div>
 

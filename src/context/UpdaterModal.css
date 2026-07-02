@@ -1,0 +1,217 @@
+.updater-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 10, 13, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.updater-card {
+  width: 90%;
+  max-width: 350px;
+  background: rgba(10, 24, 30, 0.85);
+  border: 1px solid rgba(141, 215, 234, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+              0 0 30px rgba(141, 215, 234, 0.05);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transform: scale(0.9);
+  animation: scaleIn 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.updater-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.updater-close:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.updater-icon-container {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(141, 215, 234, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: 16px;
+  box-shadow: 0 0 15px rgba(141, 215, 234, 0.15);
+}
+
+.updater-icon-container.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
+.updater-icon-container.success {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.15);
+}
+
+.updater-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.updater-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.updater-changelog-title {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.updater-changelog {
+  width: 100%;
+  max-height: 100px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: left;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  white-space: pre-wrap;
+}
+
+.updater-changelog::-webkit-scrollbar {
+  width: 4px;
+}
+.updater-changelog::-webkit-scrollbar-track {
+  background: transparent;
+}
+.updater-changelog::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.updater-progress-container {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.updater-progress-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.updater-progress-bar {
+  height: 100%;
+  background: var(--work-gradient);
+  border-radius: 3px;
+  transition: width 0.1s ease;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.updater-progress-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 8px;
+}
+
+.updater-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.updater-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.updater-btn-primary {
+  background: var(--primary);
+  color: #061014;
+  box-shadow: 0 4px 12px rgba(141, 215, 234, 0.2);
+}
+
+.updater-btn-primary:hover {
+  background: #7ac3d6;
+  box-shadow: 0 6px 16px rgba(141, 215, 234, 0.35);
+  transform: translateY(-1px);
+}
+
+.updater-btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+}
+
+.updater-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.spinner {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  to { transform: scale(1); }
+}
