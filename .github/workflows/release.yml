@@ -54,7 +54,6 @@ jobs:
           key_data = os.environ.get('SIGNING_KEY', '').strip()
           
           try:
-              # S'il a collé le fichier complet encodé en base64
               if 'dW5' in key_data:
                   key_data = base64.b64decode(key_data).decode('utf-8')
           except:
@@ -71,8 +70,7 @@ jobs:
               
           out_path = os.path.join(os.environ['RUNNER_TEMP'], 'tmurv.key')
           with open(out_path, 'w') as f:
-              f.write('untrusted comment: minisign encrypted secret key\n')
-              f.write(rwr_line + '\n')
+              f.write(rwr_line)
           "
 
       - name: Build and Publish Tauri App
