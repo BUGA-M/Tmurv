@@ -49,15 +49,13 @@ jobs:
         env:
           SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          python3 -c "import base64,os; open(os.environ['RUNNER_TEMP']+'/tmurv.key','w').write(base64.b64decode(os.environ['SIGNING_KEY']).decode())"
-          echo "TAURI_SIGNING_PRIVATE_KEY<<KEYEOF" >> $GITHUB_ENV
-          cat "$RUNNER_TEMP/tmurv.key" >> $GITHUB_ENV
-          echo "KEYEOF" >> $GITHUB_ENV
+          python3 -c "import base64,os; open(os.environ['RUNNER_TEMP']+'/tmurv.key','wb').write(base64.b64decode(os.environ['SIGNING_KEY']))"
 
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ runner.temp }}/tmurv.key
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
