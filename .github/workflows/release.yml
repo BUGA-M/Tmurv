@@ -46,7 +46,9 @@ jobs:
 
       - name: Decode signing key
         shell: bash
-        run: echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" | base64 -d > "$RUNNER_TEMP/tmurv.key"
+        env:
+          SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: python3 -c "import base64,os; open(os.environ['RUNNER_TEMP']+'/tmurv.key','wb').write(base64.b64decode(os.environ['SIGNING_KEY']))"
 
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v1
