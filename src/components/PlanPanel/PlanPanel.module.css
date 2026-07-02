@@ -178,3 +178,52 @@
   color: var(--primary);
 }
 
+.cardsGrid {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 24px 0; 
+}
+
+.goalCard {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.goalCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.goalCard.selected {
+  background: rgba(141, 215, 234, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(141, 215, 234, 0.15);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.cardHeader svg {
+  color: var(--primary);
+}
+
+.cardDescription {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Target, CheckCircle2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { 
   updateWorkDuration, 
   updateShortBreakDuration, 
-  updateLongBreakDuration 
+  updateLongBreakDuration,
+  updateMaxSessionsPerDay
 } from '../../store/pomodoroSlice';
 import styles from './PlanPanel.module.css';
 
@@ -25,6 +26,7 @@ export const PlanPanel: React.FC = () => {
     shortBreakDuration,
     longBreakDuration,
     isSoundPlaying,
+    maxSessionsPerDay,
   } = useAppSelector((state) => state.pomodoro);
 
   const handleDurationChange = (
@@ -203,6 +205,54 @@ export const PlanPanel: React.FC = () => {
               value={longMins}
               onChange={(e) => handleDurationChange(e.target.value, updateLongBreakDuration)}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Goal Settings */}
+      <div className={styles.settingsGroup} style={{ marginTop: '24px' }}>
+        <h3 className={styles.groupTitle}>
+          <Target size={16} />
+          <span>Daily Goal (Max Sessions)</span>
+        </h3>
+        <div className={styles.cardsGrid}>
+          <div 
+            className={`${styles.goalCard} ${maxSessionsPerDay === 4 ? styles.selected : ''}`}
+            onClick={() => dispatch(updateMaxSessionsPerDay(4))}
+          >
+            <div className={styles.cardHeader}>
+              <span>4 Sessions</span>
+              {maxSessionsPerDay === 4 && <CheckCircle2 size={16} />}
+            </div>
+            <div className={styles.cardDescription}>
+              Ideal for a side project or a half-day of intense work. (1 full cycle)
+            </div>
+          </div>
+          
+          <div 
+            className={`${styles.goalCard} ${maxSessionsPerDay === 8 ? styles.selected : ''}`}
+            onClick={() => dispatch(updateMaxSessionsPerDay(8))}
+          >
+            <div className={styles.cardHeader}>
+              <span>8 Sessions</span>
+              {maxSessionsPerDay === 8 && <CheckCircle2 size={16} />}
+            </div>
+            <div className={styles.cardDescription}>
+              Standard for productivity professionals. 4 to 5 hours of pure focus. (2 full cycles)
+            </div>
+          </div>
+
+          <div 
+            className={`${styles.goalCard} ${maxSessionsPerDay === 12 ? styles.selected : ''}`}
+            onClick={() => dispatch(updateMaxSessionsPerDay(12))}
+          >
+            <div className={styles.cardHeader}>
+              <span>12 Sessions</span>
+              {maxSessionsPerDay === 12 && <CheckCircle2 size={16} />}
+            </div>
+            <div className={styles.cardDescription}>
+              The absolute maximum recommended. Beware of exhaustion! (3 full cycles)
+            </div>
           </div>
         </div>
       </div>

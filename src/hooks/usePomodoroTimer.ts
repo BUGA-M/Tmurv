@@ -4,10 +4,13 @@ import {
   loadSettings, 
   setTimeLeft, 
   setIsRunning, 
-  setCycles, 
-  setIsSoundPlaying, 
+  resetTimer,
   setState,
-  PomodoroState
+  setCycles,
+  setIsSoundPlaying,
+  PomodoroState,
+  updateDailySessions,
+  updateLastSessionDate
 } from '../store/pomodoroSlice';
 import { appConfigDir, join, resolveResource } from '@tauri-apps/api/path';
 import { readFile } from '@tauri-apps/plugin-fs';
@@ -27,7 +30,10 @@ export function usePomodoroTimer() {
     activeSound,
     isRunning,
     isLoaded,
-    volume
+    volume,
+    dailySessions,
+    maxSessionsPerDay,
+    lastSessionDate
   } = useAppSelector((state) => state.pomodoro);
 
   // Refs for the timer loop
@@ -53,6 +59,9 @@ export function usePomodoroTimer() {
   const activeSoundRef = useRef(activeSound);
   const notificationsEnabledRef = useRef(notificationsEnabled);
   const volumeRef = useRef(volume);
+  const dailySessionsRef = useRef(dailySessions);
+  const lastSessionDateRef = useRef(lastSessionDate);
+  const maxSessionsPerDayRef = useRef(maxSessionsPerDay);
 
   useEffect(() => { stateRef.current = state; }, [state]);
   useEffect(() => { cyclesRef.current = cycles; }, [cycles]);
@@ -62,6 +71,20 @@ export function usePomodoroTimer() {
   useEffect(() => { activeSoundRef.current = activeSound; }, [activeSound]);
   useEffect(() => { notificationsEnabledRef.current = notificationsEnabled; }, [notificationsEnabled]);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
+  useEffect(() => { dailySessionsRef.current = dailySessions; }, [dailySessions]);
+  useEffect(() => { lastSessionDateRef.current = lastSessionDate; }, [lastSessionDate]);
+  useEffect(() => { maxSessionsPerDayRef.current = maxSessionsPerDay; }, [maxSessionsPerDay]);
+
+  // Handle daily reset
+  useEffect(() => {
+    if (isLoaded) {
+      const today = new Date().toISOString().split('T')[0];
+      if (lastSessionDate !== today) {
+        dispatch(updateDailySessions(0));
+        dispatch(updateLastSessionDate(today));
+      }
+    }
+  }, [isLoaded, lastSessionDate, dispatch]);
 
   // Load settings on startup
   useEffect(() => {
@@ -166,18 +189,29 @@ export function usePomodoroTimer() {
       const currentState = stateRef.current;
       
       if (currentState === 'WORK') {
+        const newDailySessions = dailySessionsRef.current + 1;
+        dispatch(updateDailySessions(newDailySessions));
+        
+        if (newDailySessions >= maxSessionsPerDayRef.current) {
+          dispatch(resetTimer());
+          fireNotification("Tmurv • Daily Goal Reached", "You have completed your daily goal. Take a well-deserved rest!");
+          playSound();
+          return;
+        }
+
         const newCycles = cyclesRef.current + 1;
         dispatch(setCycles(newCycles));
+        
         if (newCycles % 4 === 0) {
           pendingTransitionRef.current = { state: 'LONG_BREAK', duration: longBreakDurationRef.current };
-          fireNotification("🏆 Tmurv • Milestone Unlocked", "4 focus sessions complete! You've earned a long, relaxing break. Unplug and recharge.");
+          fireNotification("Tmurv • Milestone Unlocked", "4 focus sessions complete! You've earned a long, relaxing break. Unplug and recharge.");
         } else {
           pendingTransitionRef.current = { state: 'SHORT_BREAK', duration: shortBreakDurationRef.current };
-          fireNotification("🎯 Tmurv • Focus Complete", "Great job staying in the zone! Step away for a quick break to refresh your mind.");
+          fireNotification("Tmurv • Focus Complete", "Great job staying in the zone! Step away for a quick break to refresh your mind.");
         }
       } else {
         pendingTransitionRef.current = { state: 'WORK', duration: workDurationRef.current };
-        fireNotification("🔋 Tmurv • Break is Over", "Your break has ended. Ready to dive back in and crush your next goal? Let's go!");
+        fireNotification("Tmurv • Break is Over", "Your break has ended. Ready to dive back in and crush your next goal? Let's go!");
       }
       // Play sound for ALL transitions
       playSound();

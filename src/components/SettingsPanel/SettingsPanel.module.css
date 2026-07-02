@@ -232,7 +232,7 @@
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   transition: all 0.2s;
-  margin-top: 8px;
+  margin: 8px 0 24px 0;
 }
 
 .btnUpload:hover {

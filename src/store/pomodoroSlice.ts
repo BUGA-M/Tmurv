@@ -20,6 +20,9 @@ interface PomodoroSliceState {
   isRunning: boolean;
   isLoaded: boolean;
   volume: number;
+  maxSessionsPerDay: number;
+  dailySessions: number;
+  lastSessionDate: string;
 }
 
 const initialState: PomodoroSliceState = {
@@ -36,6 +39,9 @@ const initialState: PomodoroSliceState = {
   isRunning: false,
   isLoaded: false,
   volume: 80,
+  maxSessionsPerDay: 8,
+  dailySessions: 0,
+  lastSessionDate: new Date().toISOString().split('T')[0],
 };
 
 // Async Thunks
@@ -70,6 +76,9 @@ export const loadSettings = createAsyncThunk(
     const tray = await store.get<boolean>('minimizeToTray');
     const sound = await store.get<string>('activeSound');
     const volume = await store.get<number>('volume');
+    const maxSessionsPerDay = await store.get<number>('maxSessionsPerDay');
+    const dailySessions = await store.get<number>('dailySessions');
+    const lastSessionDate = await store.get<string>('lastSessionDate');
 
     return {
       workDuration: work ?? undefined,
@@ -79,6 +88,9 @@ export const loadSettings = createAsyncThunk(
       minimizeToTray: tray ?? undefined,
       activeSound: sound ?? undefined,
       volume: volume ?? undefined,
+      maxSessionsPerDay: maxSessionsPerDay ?? undefined,
+      dailySessions: dailySessions ?? undefined,
+      lastSessionDate: lastSessionDate ?? undefined,
     };
   }
 );
@@ -154,6 +166,36 @@ export const updateVolume = createAsyncThunk(
   }
 );
 
+export const updateMaxSessionsPerDay = createAsyncThunk(
+  'pomodoro/updateMaxSessionsPerDay',
+  async (val: number) => {
+    const store = await Store.load('settings.json');
+    await store.set('maxSessionsPerDay', val);
+    await store.save();
+    return val;
+  }
+);
+
+export const updateDailySessions = createAsyncThunk(
+  'pomodoro/updateDailySessions',
+  async (val: number) => {
+    const store = await Store.load('settings.json');
+    await store.set('dailySessions', val);
+    await store.save();
+    return val;
+  }
+);
+
+export const updateLastSessionDate = createAsyncThunk(
+  'pomodoro/updateLastSessionDate',
+  async (val: string) => {
+    const store = await Store.load('settings.json');
+    await store.set('lastSessionDate', val);
+    await store.save();
+    return val;
+  }
+);
+
 const pomodoroSlice = createSlice({
   name: 'pomodoro',
   initialState,
@@ -189,6 +231,12 @@ const pomodoroSlice = createSlice({
       state.state = 'IDLE';
       state.timeLeft = state.workDuration;
       state.cycles = 0;
+    },
+    stopTimer(state) {
+      state.isRunning = false;
+      state.isSoundPlaying = false;
+      state.state = 'IDLE';
+      state.timeLeft = state.workDuration;
     }
   },
   extraReducers: (builder) => {
@@ -219,6 +267,15 @@ const pomodoroSlice = createSlice({
         if (action.payload.volume !== undefined) {
           state.volume = action.payload.volume;
         }
+        if (action.payload.maxSessionsPerDay !== undefined) {
+          state.maxSessionsPerDay = action.payload.maxSessionsPerDay;
+        }
+        if (action.payload.dailySessions !== undefined) {
+          state.dailySessions = action.payload.dailySessions;
+        }
+        if (action.payload.lastSessionDate !== undefined) {
+          state.lastSessionDate = action.payload.lastSessionDate;
+        }
       })
       .addCase(updateWorkDuration.fulfilled, (state, action) => {
         state.workDuration = action.payload;
@@ -243,6 +300,15 @@ const pomodoroSlice = createSlice({
       })
       .addCase(updateVolume.fulfilled, (state, action) => {
         state.volume = action.payload;
+      })
+      .addCase(updateMaxSessionsPerDay.fulfilled, (state, action) => {
+        state.maxSessionsPerDay = action.payload;
+      })
+      .addCase(updateDailySessions.fulfilled, (state, action) => {
+        state.dailySessions = action.payload;
+      })
+      .addCase(updateLastSessionDate.fulfilled, (state, action) => {
+        state.lastSessionDate = action.payload;
       });
   }
 });
@@ -256,6 +322,7 @@ export const {
   startTimer,
   pauseTimer,
   resetTimer,
+  stopTimer,
 } = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;

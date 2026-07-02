@@ -1,8 +1,8 @@
-import React from 'react';
-import { Play, Pause, Square, VolumeX } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Pause, Square, VolumeX, RotateCcw, Target, AlertTriangle } from 'lucide-react';
 import logo from '../../assets/Tmurv-logo.png';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { startTimer, pauseTimer, resetTimer } from '../../store/pomodoroSlice';
+import { startTimer, pauseTimer, resetTimer, stopTimer, updateDailySessions } from '../../store/pomodoroSlice';
 import styles from './Timer.module.css';
 
 interface TimerProps {
@@ -18,6 +18,8 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
     cycles,
     isRunning,
     isSoundPlaying,
+    dailySessions,
+    maxSessionsPerDay,
   } = useAppSelector((state) => state.pomodoro);
 
   const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
@@ -39,6 +41,22 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
     else if (state === 'LONG_BREAK') cls += ` ${styles.stateLongBreak}`;
     else cls += ` ${styles.stateIdle}`;
     return cls;
+  };
+
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleResetDaily = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmResetDaily = () => {
+    dispatch(updateDailySessions(0));
+    dispatch(resetTimer());
+    setShowResetConfirm(false);
+  };
+
+  const cancelResetDaily = () => {
+    setShowResetConfirm(false);
   };
 
   return (
@@ -65,43 +83,84 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
         ))}
       </div>
 
-      <div className={styles.btnGroup} style={{ marginTop: '32px' }}>
-        {isSoundPlaying ? (
+      <div className={styles.dailyProgressContainer}>
+        <div className={styles.dailyText}>
+          Sessions today: {dailySessions} / {maxSessionsPerDay}
+          <button 
+            className={styles.dailyResetBtn} 
+            onClick={handleResetDaily}
+            title="Reset daily sessions"
+          >
+            <RotateCcw size={14} />
+          </button>
+        </div>
+      </div>
+
+      {isSoundPlaying ? (
+        <div className={styles.btnGroup} style={{ marginTop: '32px' }}>
           <button 
             className={`${styles.btn} ${styles.btnDismissSound}`} 
             onClick={onDismissSound} 
-            title="Stop sound and start break"
+            title="Stop sound"
           >
             <VolumeX size={28} />
             <span className={styles.dismissLabel}>Dismiss</span>
           </button>
-        ) : (
-          <>
-            {isRunning ? (
-              <button 
-                className={`${styles.btn} ${styles.btnPrimary}`} 
-                onClick={() => dispatch(pauseTimer())}
-              >
-                <Pause size={32} />
-              </button>
-            ) : (
-              <button 
-                className={`${styles.btn} ${styles.btnPrimary}`} 
-                onClick={() => dispatch(startTimer())}
-              >
-                <Play size={32} style={{ marginLeft: '4px' }} />
-              </button>
-            )}
-            
+        </div>
+      ) : dailySessions >= maxSessionsPerDay ? (
+        <div className={styles.goalReachedPopup}>
+           <div className={styles.goalIconContainer}>
+              <Target size={32} />
+           </div>
+           <h3>Daily Goal Reached!</h3>
+           <p>The work for the day is finished. Take a well-deserved rest, or reset to start again.</p>
+           <button onClick={handleResetDaily} className={styles.btnResetGoal}>
+              <RotateCcw size={18} />
+              Reset & Continue
+           </button>
+        </div>
+      ) : (
+        <div className={styles.btnGroup} style={{ marginTop: '32px' }}>
+          {isRunning ? (
             <button 
-              className={styles.btn} 
-              onClick={() => dispatch(resetTimer())}
+              className={`${styles.btn} ${styles.btnPrimary}`} 
+              onClick={() => dispatch(pauseTimer())}
             >
-              <Square size={24} />
+              <Pause size={32} />
             </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <button 
+              className={`${styles.btn} ${styles.btnPrimary}`} 
+              onClick={() => dispatch(startTimer())}
+            >
+              <Play size={32} style={{ marginLeft: '4px' }} />
+            </button>
+          )}
+          
+          <button 
+            className={styles.btn} 
+            onClick={() => dispatch(stopTimer())}
+          >
+            <Square size={24} />
+          </button>
+        </div>
+      )}
+
+      {showResetConfirm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalIconContainer}>
+              <AlertTriangle size={24} />
+            </div>
+            <h3>Reset Progress?</h3>
+            <p>This will reset your daily sessions and the timer. Are you sure you want to start from zero?</p>
+            <div className={styles.modalBtnGroup}>
+              <button onClick={cancelResetDaily} className={styles.btnCancel}>Cancel</button>
+              <button onClick={confirmResetDaily} className={styles.btnConfirm}>Reset</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
