@@ -46,7 +46,9 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleResetDaily = () => {
-    setShowResetConfirm(true);
+    if (dailySessions > 0) {
+      setShowResetConfirm(true);
+    }
   };
 
   const confirmResetDaily = () => {
@@ -90,6 +92,7 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
             className={styles.dailyResetBtn} 
             onClick={handleResetDaily}
             title="Reset daily sessions"
+            disabled={dailySessions === 0}
           >
             <RotateCcw size={14} />
           </button>

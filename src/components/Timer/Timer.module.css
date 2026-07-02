@@ -209,9 +209,15 @@
   transition: all 0.2s;
 }
 
-.dailyResetBtn:hover {
+.dailyResetBtn:hover:not(:disabled) {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
+}
+
+.dailyResetBtn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  color: var(--text-muted);
 }
 
 .goalReachedPopup {
