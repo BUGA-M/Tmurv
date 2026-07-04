@@ -1,14 +1,14 @@
-import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { HashRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import logo from './assets/Tmurv-logo.png';
 import { TimerPage } from './pages/TimerPage';
 import { UpdaterProvider } from './context/UpdaterContext';
 import { PlanPage } from './pages/PlanPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { usePomodoroTimer } from './hooks/usePomodoroTimer';
-import { Clock, Calendar, Settings as SettingsIcon, X, Minus, Pin, PinOff } from 'lucide-react';
+import { Clock, Calendar, Settings as SettingsIcon, X, Minus, Pin, PinOff, AlertTriangle } from 'lucide-react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { invoke } from '@tauri-apps/api/core';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './store/store';
 import { setIsMiniMode } from './store/pomodoroSlice';
 
@@ -16,6 +16,8 @@ function AppContent() {
   const { isLoaded, dismissSound } = usePomodoroTimer();
   const dispatch = useAppDispatch();
   const isMiniMode = useAppSelector((state) => state.pomodoro.isMiniMode);
+  const [showWarning, setShowWarning] = useState(false);
+  const location = useLocation();
 
   const handleMinimize = async () => {
     try {
@@ -44,6 +46,10 @@ function AppContent() {
   };
 
   const toggleMiniMode = () => {
+    if (location.pathname !== '/') {
+      setShowWarning(true);
+      return;
+    }
     dispatch(setIsMiniMode(!isMiniMode));
   };
 
@@ -120,9 +126,28 @@ function AppContent() {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </div>
+
+      {/* Custom Frontend Modal Popup */}
+      {showWarning && (
+        <div className="warning-overlay">
+          <div className="glass-panel warning-modal">
+            <div className="warning-icon">
+              <AlertTriangle size={24} />
+            </div>
+            <h3 className="warning-title">Mini-Player Restricted</h3>
+            <p className="warning-text">
+              The mini-player mode is only available on the timer page.
+            </p>
+            <button onClick={() => setShowWarning(false)} className="warning-btn">
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 export default function App() {
   return (
