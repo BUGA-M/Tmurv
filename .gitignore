@@ -40,3 +40,6 @@ Thumbs.db
 # Tauri specific 
 src-tauri/target/
 src-tauri/gen/schemas/
+
+# test minisign
+test_minisign/
