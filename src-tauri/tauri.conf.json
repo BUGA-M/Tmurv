@@ -69,7 +69,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "RWSBjwdtT1ioNbf6gc4pBwARuwmkPKjNhjsxeZTxFAAHYH4M4P+GXwOB",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM1QTg1ODRGNkQwNzhGODEKUldTQmp3ZHRUMWlvTmJmNmdjNHBCd0FSdXdta1BLak5oanN4ZVpUeEZBQUhZSDRNNFArR1h3T0IK ",
       "endpoints": [
         "https://github.com/BUGA-M/Tmurv/releases/latest/download/latest.json"
       ]
