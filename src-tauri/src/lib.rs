@@ -4,6 +4,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Manager, State};
+use tauri::{LogicalSize, PhysicalSize};
 use tauri::tray::{TrayIconBuilder, MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 
@@ -14,6 +15,73 @@ struct AppState {
 #[tauri::command]
 fn set_minimize_to_tray(state: State<'_, AppState>, enabled: bool) {
     state.minimize_to_tray.store(enabled, Ordering::Relaxed);
+}
+
+#[tauri::command]
+fn toggle_mini_mode(app: AppHandle, enable: bool) -> Result<(), String> {
+    let window = app.get_webview_window("main")
+        .ok_or("Window not found")?;
+
+    std::thread::spawn(move || {
+        let start_size = match window.inner_size() {
+            Ok(s) => s,
+            Err(_) => return,
+        };
+        let scale_factor = match window.scale_factor() {
+            Ok(sf) => sf,
+            Err(_) => return,
+        };
+        
+        let target_logical = if enable {
+            LogicalSize::new(220.0, 290.0)
+        } else {
+            LogicalSize::new(400.0, 610.0)
+        };
+        
+        let target_physical = target_logical.to_physical::<u32>(scale_factor);
+        
+        let steps = 20;
+        let step_duration = std::time::Duration::from_millis(8); // ~160ms total
+        
+        let start_w = start_size.width as f64;
+        let start_h = start_size.height as f64;
+        let target_w = target_physical.width as f64;
+        let target_h = target_physical.height as f64;
+        
+        let _ = window.set_resizable(true);
+        let _ = window.set_min_size(Some(LogicalSize::new(100.0, 100.0)));
+        let _ = window.set_max_size(None::<LogicalSize<f64>>);
+        
+        for i in 1..=steps {
+            let t = i as f64 / steps as f64;
+            // easeInOutQuad
+            let ease_t = if t < 0.5 {
+                2.0 * t * t
+            } else {
+                -1.0 + (4.0 - 2.0 * t) * t
+            };
+            
+            let curr_w = start_w + (target_w - start_w) * ease_t;
+            let curr_h = start_h + (target_h - start_h) * ease_t;
+            
+            let _ = window.set_size(PhysicalSize::new(curr_w as u32, curr_h as u32));
+            std::thread::sleep(step_duration);
+        }
+        
+        if enable {
+            let _ = window.set_min_size(Some(LogicalSize::new(220.0, 290.0)));
+            let _ = window.set_max_size(Some(LogicalSize::new(220.0, 290.0)));
+            let _ = window.set_resizable(false);
+            let _ = window.set_always_on_top(true);
+        } else {
+            let _ = window.set_min_size(Some(LogicalSize::new(400.0, 610.0)));
+            let _ = window.set_max_size(Some(LogicalSize::new(400.0, 610.0)));
+            let _ = window.set_resizable(false);
+            let _ = window.set_always_on_top(false);
+        }
+    });
+
+    Ok(())
 }
 
 #[tauri::command]
@@ -70,7 +138,7 @@ pub fn run() {
         .manage(AppState {
             minimize_to_tray: AtomicBool::new(true), // Default is true
         })
-        .invoke_handler(tauri::generate_handler![upload_sound, set_minimize_to_tray])
+        .invoke_handler(tauri::generate_handler![upload_sound, set_minimize_to_tray, toggle_mini_mode])
         .setup(|app| {
             let quit_i = MenuItem::with_id(app, "quit", "Quit Tmurv", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Open Tmurv", true, None::<&str>)?;

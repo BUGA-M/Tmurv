@@ -23,6 +23,7 @@ interface PomodoroSliceState {
   maxSessionsPerDay: number;
   dailySessions: number;
   lastSessionDate: string;
+  isMiniMode: boolean;
 }
 
 const initialState: PomodoroSliceState = {
@@ -42,6 +43,7 @@ const initialState: PomodoroSliceState = {
   maxSessionsPerDay: 8,
   dailySessions: 0,
   lastSessionDate: new Date().toISOString().split('T')[0],
+  isMiniMode: false,
 };
 
 // Async Thunks
@@ -215,6 +217,9 @@ const pomodoroSlice = createSlice({
     setIsRunning(state, action: PayloadAction<boolean>) {
       state.isRunning = action.payload;
     },
+    setIsMiniMode(state, action: PayloadAction<boolean>) {
+      state.isMiniMode = action.payload;
+    },
     startTimer(state) {
       if (state.state === 'IDLE') {
         state.state = 'WORK';
@@ -319,6 +324,7 @@ export const {
   setCycles,
   setIsSoundPlaying,
   setIsRunning,
+  setIsMiniMode,
   startTimer,
   pauseTimer,
   resetTimer,

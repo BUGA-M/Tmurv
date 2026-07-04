@@ -20,6 +20,7 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
     isSoundPlaying,
     dailySessions,
     maxSessionsPerDay,
+    isMiniMode,
   } = useAppSelector((state) => state.pomodoro);
 
   const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
@@ -62,42 +63,48 @@ export const Timer: React.FC<TimerProps> = ({ onDismissSound }) => {
   };
 
   return (
-    <div className={styles.timerContainer}>
-      <div className={styles.timerLogoContainer}>
-        <img 
-          src={logo} 
-          className={`${styles.timerLogoImg} ${isRunning ? styles.pulseSlow : ''}`} 
-          alt="Tmurv Logo" 
-        />
-      </div>
-      <div className={styles.statusText}>{getStateText()}</div>
+    <div className={`${styles.timerContainer} ${isMiniMode ? styles.miniMode : ''}`}>
+      {!isMiniMode && (
+        <div className={styles.timerLogoContainer}>
+          <img 
+            src={logo} 
+            className={`${styles.timerLogoImg} ${isRunning ? styles.pulseSlow : ''}`} 
+            alt="Tmurv Logo" 
+          />
+        </div>
+      )}
+      {!isMiniMode && <div className={styles.statusText}>{getStateText()}</div>}
       
       <div className={getTimerDisplayClass()}>
         {mins}:{secs}
       </div>
 
-      <div className={styles.cycleDots}>
-        {[0, 1, 2, 3].map((i) => (
-          <div 
-            key={i} 
-            className={`${styles.dot} ${i < (cycles % 4) ? styles.active : ''}`} 
-          />
-        ))}
-      </div>
-
-      <div className={styles.dailyProgressContainer}>
-        <div className={styles.dailyText}>
-          Sessions today: {dailySessions} / {maxSessionsPerDay}
-          <button 
-            className={styles.dailyResetBtn} 
-            onClick={handleResetDaily}
-            title="Reset daily sessions"
-            disabled={dailySessions === 0}
-          >
-            <RotateCcw size={14} />
-          </button>
+      {!isMiniMode && (
+        <div className={styles.cycleDots}>
+          {[0, 1, 2, 3].map((i) => (
+            <div 
+              key={i} 
+              className={`${styles.dot} ${i < (cycles % 4) ? styles.active : ''}`} 
+            />
+          ))}
         </div>
-      </div>
+      )}
+
+      {!isMiniMode && (
+        <div className={styles.dailyProgressContainer}>
+          <div className={styles.dailyText}>
+            Sessions today: {dailySessions} / {maxSessionsPerDay}
+            <button 
+              className={styles.dailyResetBtn} 
+              onClick={handleResetDaily}
+              title="Reset daily sessions"
+              disabled={dailySessions === 0}
+            >
+              <RotateCcw size={14} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {isSoundPlaying ? (
         <div className={styles.btnGroup} style={{ marginTop: '32px' }}>

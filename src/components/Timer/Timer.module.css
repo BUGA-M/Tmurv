@@ -395,3 +395,29 @@
   background: #dc2626;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
+
+/* Mini Mode Styles */
+.timerContainer.miniMode {
+  padding: 10px 0;
+}
+
+.miniMode .timerDisplay {
+  font-size: 3.5rem;
+  margin: 10px 0;
+}
+
+.miniMode .btnGroup {
+  margin-top: 15px !important;
+  gap: 15px;
+}
+
+.miniMode .btn {
+  width: 44px;
+  height: 44px;
+}
+
+.miniMode .btnPrimary {
+  width: 52px;
+  height: 52px;
+}
+
